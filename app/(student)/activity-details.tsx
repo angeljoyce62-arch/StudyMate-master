@@ -1,0 +1,11 @@
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Button, C, Card, Header, PriorityBadge } from "../../components/UI";
+import { useApp } from "../../context/AppContext";
+
+export default function ActivityDetails(){
+ const {id}=useLocalSearchParams<{id:string}>(); const router=useRouter(); const {activities,addTaskFromActivity,tasks}=useApp(); const a=activities.find(x=>x.id===id); if(!a)return <View style={s.screen}><Header title="Activity" onBack={()=>router.back()}/><Text style={s.none}>Activity not found.</Text></View>;
+ const exists=tasks.some(t=>t.sourceActivityId===a.id);
+ return <ScrollView style={s.screen} contentContainerStyle={s.content}><Header title="Activity Details" onBack={()=>router.back()}/><Card><Text style={s.title}>{a.title}</Text><Text style={s.subject}>{a.subject}</Text><View style={s.row}><PriorityBadge priority={a.priority}/><Text style={s.date}>Due {a.dueDate}</Text></View><Text style={s.label}>Description</Text><Text style={s.body}>{a.description}</Text>{a.attachment?<View style={s.attach}><Text style={s.attachText}>📎 {a.attachment}</Text></View>:null}</Card><View style={{marginTop:14}}>{exists?<Button title="ALREADY IN MY TASKS" onPress={()=>Alert.alert("Task","This activity is already in your Tasks.")} secondary/>:<Button title="ADD TO MY TASKS" icon="add-circle-outline" onPress={()=>{addTaskFromActivity(a);Alert.alert("Added","Activity added to your Tasks.")}}/>}</View></ScrollView>
+}
+const s=StyleSheet.create({screen:{flex:1,backgroundColor:C.bg},content:{padding:20,paddingBottom:35},title:{color:"#fff",fontSize:23,fontWeight:"800"},subject:{color:"#6E91FF",fontWeight:"700",marginTop:5},row:{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginTop:18},date:{color:C.muted,fontSize:12},label:{color:C.muted,fontWeight:"800",fontSize:12,marginTop:22,marginBottom:7},body:{color:"#DCE7F5",fontSize:13,lineHeight:20},attach:{marginTop:16,padding:12,borderRadius:11,backgroundColor:C.card2,borderWidth:1,borderColor:C.border},attachText:{color:"#fff",fontSize:12},none:{color:C.muted,textAlign:"center",marginTop:30}});

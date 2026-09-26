@@ -1,0 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { C, Card, Header, PriorityBadge, SearchBox } from "../../components/UI";
+import { getTaskPriority, useApp } from "../../context/AppContext";
+
+export default function Tasks(){
+ const router=useRouter(); const {tasks,toggleTask,deleteTask,currentUser}=useApp(); const [q,setQ]=useState(""); const [filter,setFilter]=useState("All");
+ const myTasks=tasks.filter(task=>task.userId===currentUser?.id);
+ const filtered=myTasks.filter(t=>{const qok=`${t.title} ${t.subject}`.toLowerCase().includes(q.toLowerCase());const fok=filter==="All"||filter==="Done"&&t.completed||filter==="Pending"&&!t.completed;return qok&&fok;});
+ return <ScrollView style={s.screen} contentContainerStyle={s.content}><Header title="Tasks" subtitle={`${myTasks.filter(t=>!t.completed).length} pending`} right={<TouchableOpacity style={s.add} onPress={()=>router.push({pathname:"/(student)/task-form",params:{mode:"add"}})}><Ionicons name="add" size={20} color="#fff"/></TouchableOpacity>}/><SearchBox placeholder="Search tasks..." value={q} onChangeText={setQ}/><View style={s.filters}>{["All","Pending","Done"].map(x=><TouchableOpacity key={x} onPress={()=>setFilter(x)} style={[s.filter,filter===x&&s.active]}><Text style={[s.filterText,filter===x&&{color:"#fff"}]}>{x}</Text></TouchableOpacity>)}</View>
+ {filtered.map(t=><Card key={t.id} style={s.card}><TouchableOpacity onPress={()=>toggleTask(t.id)} style={[s.checkbox,t.completed&&s.checked]}>{t.completed&&<Ionicons name="checkmark" size={15} color="#fff"/>}</TouchableOpacity><TouchableOpacity style={{flex:1}} onPress={()=>router.push({pathname:"/(student)/task-form",params:{mode:"edit",id:t.id}})}><Text style={[s.title,t.completed&&s.strike]}>{t.title}</Text><Text style={s.muted}>{t.subject} • Due {t.dueDate}</Text></TouchableOpacity><PriorityBadge priority={getTaskPriority(t.dueDate)}/><TouchableOpacity onPress={()=>Alert.alert("Delete Task","Delete this task?",[{text:"Cancel"},{text:"Delete",style:"destructive",onPress:()=>deleteTask(t.id)}])} style={s.trash}><Ionicons name="trash-outline" size={16} color={C.red}/></TouchableOpacity></Card>)}
+ </ScrollView>
+}
+const s=StyleSheet.create({screen:{flex:1,backgroundColor:C.bg},content:{padding:20,paddingBottom:35},add:{width:38,height:38,borderRadius:12,backgroundColor:C.blue,alignItems:"center",justifyContent:"center"},filters:{flexDirection:"row",marginBottom:12,gap:8},filter:{paddingHorizontal:15,paddingVertical:8,borderRadius:10,backgroundColor:C.card},active:{backgroundColor:C.blue},filterText:{color:C.muted,fontSize:11,fontWeight:"800"},card:{flexDirection:"row",alignItems:"center",marginBottom:9},checkbox:{width:21,height:21,borderRadius:6,borderWidth:1.5,borderColor:C.muted2,alignItems:"center",justifyContent:"center",marginRight:10},checked:{backgroundColor:C.green,borderColor:C.green},title:{color:"#fff",fontWeight:"800",fontSize:13},strike:{textDecorationLine:"line-through",color:C.muted2},muted:{color:C.muted,fontSize:10,marginTop:4},trash:{marginLeft:7,padding:6}});

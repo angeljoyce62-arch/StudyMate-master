@@ -1,0 +1,3 @@
+Run this inside the Expo project:
+
+npx expo install expo-router expo-linear-gradient @react-native-async-storage/async-storage

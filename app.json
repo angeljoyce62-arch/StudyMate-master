@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "StudyMate",
+    "slug": "studymate",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "studymate",
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
